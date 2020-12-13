@@ -76,3 +76,8 @@ class Board:
         row = int(LetterToNumber(position[0]))
         column = int(position[-1])
         self.board[column - 1][row - 1] = None
+
+    def GetPiece(self, position):
+        row = int(LetterToNumber(position[0]))
+        column = int(position[-1])
+        return self.board[column - 1][row - 1]

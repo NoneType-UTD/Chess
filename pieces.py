@@ -7,6 +7,7 @@ class Pawn:
         self.points = 1
         self.name = "Pawn"
         self.startingPosition = ''
+        self.enPassant = False
 
     def SetColor(self, color):
         self.color = color
@@ -22,6 +23,9 @@ class Pawn:
 
     def SetPosition(self, Position):
         self.startingPosition = Position
+
+    def GetEnPassant(self):
+        return self.enPassant
 
 
 class Knight:
