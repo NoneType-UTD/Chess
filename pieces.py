@@ -6,9 +6,22 @@ class Pawn:
         self.color = None
         self.points = 1
         self.name = "Pawn"
+        self.startingPosition = ''
 
     def SetColor(self, color):
         self.color = color
+
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
+
+    def SetPosition(self, Position):
+        self.startingPosition = Position
 
 
 class Knight:
@@ -20,8 +33,15 @@ class Knight:
     def SetColor(self, color):
         self.color = color
 
+    def GetColor(self):
+        return self.color
+
     def GetPoints(self):
         return self.points
+
+    def GetName(self):
+        return self.name
+
 
 class DarkBishop:
     def __init__(self):
@@ -31,6 +51,15 @@ class DarkBishop:
 
     def SetColor(self, color):
         self.color = color
+
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
 
 
 class LightBishop:
@@ -42,6 +71,15 @@ class LightBishop:
     def SetColor(self, color):
         self.color = color
 
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
+
 
 class Rook:
     def __init__(self):
@@ -51,6 +89,15 @@ class Rook:
 
     def SetColor(self, color):
         self.color = color
+
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
 
 
 class Queen:
@@ -62,12 +109,37 @@ class Queen:
     def SetColor(self, color):
         self.color = color
 
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
+
 
 class King:
     def __init__(self):
         self.color = None
         self.points = math.inf
         self.name = "King"
+        self.check = False
 
     def SetColor(self, color):
         self.color = color
+
+    def GetColor(self):
+        return self.color
+
+    def GetPoints(self):
+        return self.points
+
+    def GetName(self):
+        return self.name
+
+    def IsCheck(self):
+        return self.checkmate
+
+    def SetCheck(self, isCheck):
+        self.checkmate = isCheck
