@@ -143,7 +143,7 @@ class King:
         return self.name
 
     def IsCheck(self):
-        return self.checkmate
+        return self.check
 
     def SetCheck(self, isCheck):
-        self.checkmate = isCheck
+        self.check = isCheck

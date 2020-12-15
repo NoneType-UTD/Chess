@@ -27,6 +27,7 @@ class Game:
         self.turns = 0
         self.columns = 'abcdefgh'
         self.rows = '12345678'
+        self.piecesNames = ['Pawn', 'Knight', 'Darkbishop', 'Lightbishop', 'Rook', 'Queen', 'King']
 
     def SetBoard(self):
         colors = ['White', 'Black']
@@ -75,60 +76,83 @@ class Game:
     def PrintGame(self):
         self.startingBoard.PrintBoard()
 
-    def LegalMove(self, move):
+    def LegalMove(self, move: tuple[:3]):
         """
-        Format is (piece, startPosition, endPosition)
+        Format is a tuple (piece, startPosition, endPosition)
+        Example: ('Pawn', 'e2', 'e4')
         """
-        pieceName = move[0]
-        startPosition = move[1]
-        endPosition = move[2]
+        pieceName: str = move[0].capitalize()
+        startPosition: str = move[1].lower()
+        endPosition: str = move[2].lower()
 
         if self.startingBoard.GetPiece(startPosition).GetName() is not pieceName:
-            return False
+            raise Exception('Piece is not on starting position.')
+
+        if startPosition == endPosition:
+            raise Exception('Piece has not moved.')
+
+        if startPosition[0] not in self.columns and endPosition[0] not in self.columns \
+                and 1 <= int(startPosition[1]) <= 8 and 1 <= int(endPosition[1]) <= 8:
+            raise Exception('Piece\'s start or end position is not on the board.')
+
+        if pieceName not in self.piecesNames:
+            raise Exception('Not a valid Piece name')
 
         if turn(self.turns) == 'White':
-            if startPosition == endPosition:
-                return False
-            elif startPosition[0].lower() not in self.columns and endPosition[0].lower() not in self.columns:
-                return False
-            if pieceName == 'Pawn':
-                if endPosition[-1] - startPosition[-1] == 1:
-                    if endPosition[0] == startPosition[0] and self.startingBoard.GetPiece(startPosition) is None:
-                        return True
-                    elif (endPosition[0] - startPosition[0]) == 2 and \
-                            self.startingBoard.GetPiece(startPosition[0] + str(int(startPosition[-1] - 1))) is not None:
-                        return True
-                    #TODO FIX THIS
-                    elif endPosition[0] != startPosition[0] and self.startingBoard.GetPiece(endPosition) is None \
-                            and self.startingBoard.GetPiece(endPosition):
+            # Code for legal moves for a pawn
+            if pieceName == self.piecesNames[0]:
 
+                if endPosition[0] == startPosition[0]:  # If on the same file it means pawn is not capturing
 
+                    if int(endPosition[1]) - int(startPosition[1]) == 1:  # If the pawn moves up 1 square
 
-        if self.rows.find(startPosition[0].lower()) + self.rows.find(endPosition[0].lower()) <= 2:
+                        if self.startingBoard.GetPiece(endPosition) is None:
+                            # Test if there is no piece on the end position then it is a legal move
+                            return True, {'EnPassant': False}
+                        else:
+                            raise Exception(f'There is a {self.startingBoard.GetPiece(endPosition)} '
+                                            f'on {endPosition} blocking your Pawn')
 
-        if pieceName == 'Pawn':
-            if turn(self.turns) == 'White':
-                if endPosition[-1] - startPosition[-1] == 1:
-                    if endPosition[0] == startPosition[0] and self.startingBoard.GetPiece(startPosition) is None:
-                        return True
-                    elif endPosition[0] != startPosition[0] and self.startingBoard.GetPiece(endPosition) is not None \
-                            and self.startingBoard.GetPiece(endPosition).GetColor() == 'Black':
-                        return True
-                    elif endPosition[0] != startPosition[0] and self.startingBoard.GetPiece(endPosition) is None \
-                            and self.startingBoard.GetPiece(endPosition):
+                    elif int(endPosition[1]) - int(startPosition[1]) == 2:
+                        # Test if the two squares above the pawn are empty and the pawn is on the second rank
+                        if self.startingBoard.GetPiece(startPosition[0] + str(int(startPosition[1]) + 1)) is None \
+                                and self.startingBoard.GetPiece(endPosition) is None \
+                                and startPosition[1] == '2':
+                            return True, {'EnPassant': True}
+                        else:
+                            raise Exception('Invalid Move')
                     else:
-                        return False
-                elif startPosition[-1] == 2 and turn(self.turns) and (endPosition[-1] - startPosition[-1]) == 2:
-                    return True
-                elif
+                        raise Exception('Invalid Move')
+                elif abs(self.columns.find(endPosition[0]) - self.columns.find(startPosition[0])) == 1:
+
+                    if self.startingBoard.GetPiece(endPosition) is not None \
+                            and self.startingBoard.GetPiece(endPosition).GetColor() == 'Black':
+
+                        return True, {'EnPassant': False}
+
+                    elif self.startingBoard.GetPiece(endPosition) is None:
+                        testEnPassant = self.startingBoard.GetPiece(endPosition[0] + str(int(endPosition[1]) - 1))
+                        if testEnPassant is not None and testEnPassant.GetName() == 'Pawn' \
+                                and testEnPassant.GetEnPassant() is True:
+                            self.startingBoard.DelPiece(endPosition[0] + str(int(endPosition[1]) - 1))
+                            return True, {'EnPassant': False}
+                        else:
+                            raise Exception('No piece to capture')
+                    else:
+                        raise Exception('Invalid Move')
                 else:
-                    return False
-            elif startPosition[-1] == 7 and self.startingBoard.GetPiece(startPosition).GetColor() == 'Black' \
-                    and (startPosition[-1] - endPosition[-1]) == 2:
-                legal = True
+                    raise Exception('Invalid Move')
 
     def NewMove(self, move):
-        self.startingBoard.DelPiece(move[1])
-        self.startingBoard.DelPiece(move[2])
-        self.startingBoard.SetPiece(move[0], move[2])
-        self.turns += 0.5
+        legalMove = self.LegalMove(move)
+        if type(tuple) == type(legalMove):
+            if 'EnPassant' in legalMove[1]:
+                self.startingBoard.DelPiece(move[1])
+                self.startingBoard.DelPiece(move[2])
+                self.startingBoard.SetPiece(move[0], move[2])
+                self.turns += 0.5
+        if self.LegalMove(move):
+            self.startingBoard.DelPiece(move[1])
+            self.startingBoard.DelPiece(move[2])
+            self.startingBoard.SetPiece(move[0], move[2])
+            self.turns += 0.5
